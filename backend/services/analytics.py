@@ -1,6 +1,8 @@
 import pandas as pd
 import numpy as np
 from sklearn.linear_model import LinearRegression
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.preprocessing import StandardScaler
 
 def calculate_eoq(demand: float, ordering_cost: float, holding_cost: float) -> float:
     """
@@ -75,6 +77,107 @@ def abc_analysis(db):
     df['category'] = df['percentage'].apply(classify)
     
     return df[['product_id', 'name', 'value', 'category']].to_dict(orient='records')
+
+def classify_suppliers(db):
+    """
+    Classify suppliers using K-Nearest Neighbors (KNN).
+    Features (Simulated): Delivery Time (days), Defect Rate (%)
+    Target: Reliability Tier (High, Medium, Low)
+    """
+    suppliers = list(db.suppliers.find())
+    if not suppliers:
+        return []
+
+    data = [] 
+    for s in suppliers:
+        # Simulate features based on reliability_score (higher score = better metrics)
+        # reliability_score is roughly 0.0 to 5.0
+        score = s.get("reliability_score", 3.0) 
+        
+        # Inverse logic: Higher score -> Lower delivery time, Lower defect rate
+        delivery_time = 10 - (score * 1.5) + np.random.normal(0, 0.5) # Approx 2.5 to 10 days
+        defect_rate = 5 - (score * 0.8) + np.random.normal(0, 0.2)   # Approx 1% to 5%
+        
+        # Clamp values
+        delivery_time = max(1, delivery_time)
+        defect_rate = max(0, defect_rate)
+
+        data.append({
+            "id": s["id"],
+            "name": s["name"],
+            "reliability_score": score,
+            "delivery_time": round(delivery_time, 1),
+            "defect_rate": round(defect_rate, 2)
+        })
+
+    df = pd.DataFrame(data)
+
+    # Prepare Training Data
+    X = df[['delivery_time', 'defect_rate']]
+    
+    # Define Logic for "Ground Truth" labels (for training demo)
+    # real scenario: use historical labeled data
+    conditions = [
+        (df['reliability_score'] >= 4.0),
+        (df['reliability_score'] >= 2.5) & (df['reliability_score'] < 4.0),
+        (df['reliability_score'] < 2.5)
+    ]
+    choices = ['High Performance', 'Average', 'Risk']
+    df['tier'] = np.select(conditions, choices, default='Average')
+
+    y = df['tier']
+
+    # Train KNN
+    scaler = StandardScaler()
+    X_scaled = scaler.fit_transform(X)
+    
+    # K=3 or less if few samples
+    k = min(3, len(df))
+    knn = KNeighborsClassifier(n_neighbors=k)
+    knn.fit(X_scaled, y)
+
+    # Predict (Self-predict/Validation for demo)
+    predictions = knn.predict(X_scaled)
+    df['predicted_tier'] = predictions
+
+    return df.to_dict(orient='records')
+
+def get_eoq_data(db):
+    """
+    Calculate EOQ for all products to identify optimal order quantities.
+    Returns products with current stock, EOQ, and status.
+    """
+    products = list(db.products.find())
+    results = []
+
+    for p in products:
+        # Annual Demand (D) - simplified estimation based on orders or static field
+        # In a real app, calculate D from order history over last year
+        # For now, let's assume a standard annual demand or random for demo if not in DB
+        annual_demand = p.get("annual_demand", 1000) 
+        ordering_cost = 50.0 # Fixed cost per order (setup, shipping)
+        holding_cost = p["price"] * 0.2 # 20% of price per year
+
+        eoq = calculate_eoq(annual_demand, ordering_cost, holding_cost)
+        
+        status = "Good"
+        if p["stock_level"] < eoq * 0.5:
+             status = "Understocked"
+        elif p["stock_level"] > eoq * 2:
+             status = "Overstocked"
+
+        results.append({
+            "id": p["id"],
+            "name": p["name"],
+            "current_stock": p["stock_level"],
+            "eoq": round(eoq, 0),
+            "status": status
+        })
+    
+    # Sort by status priority (Understocked first)
+    results.sort(key=lambda x: 0 if x["status"] == "Understocked" else (1 if x["status"] == "Overstocked" else 2))
+    
+    return results
 
 def analyze_file(file_content, filename: str):
     """

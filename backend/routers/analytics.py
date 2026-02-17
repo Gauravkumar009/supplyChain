@@ -17,6 +17,16 @@ def get_abc_classification(db = Depends(database.get_db)):
     result = scms_analysis.abc_analysis(db)
     return result
 
+@router.get("/supplier-classification")
+def get_supplier_classification(db = Depends(database.get_db)):
+    result = scms_analysis.classify_suppliers(db)
+    return result
+
+@router.get("/eoq")
+def get_eoq_analysis(db = Depends(database.get_db)):
+    result = scms_analysis.get_eoq_data(db)
+    return result
+
 @router.get("/dashboard-stats")
 def get_dashboard_stats(db = Depends(database.get_db)):
     # Calculate Total Revenue using Aggregation

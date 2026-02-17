@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart, Line } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from 'recharts';
 import api from '../services/api';
 
 const Analytics = () => {
   const [forecastData, setForecastData] = useState([]);
   const [abcData, setAbcData] = useState([]);
+  const [knnData, setKnnData] = useState([]);
+  const [eoqData, setEoqData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [analysisResult, setAnalysisResult] = useState(null);
   const [uploading, setUploading] = useState(false);
@@ -46,6 +48,22 @@ const Analytics = () => {
 
         const abcRes = await api.get('/analytics/abc');
         setAbcData(abcRes.data.slice(0, 10)); // Top 10 for view
+
+        // Fetch Supplier Classification (KNN)
+        const knnRes = await api.get('/analytics/supplier-classification');
+        // Process for Pie Chart
+        if (knnRes.data) {
+             const tiers = { "High Performance": 0, "Average": 0, "Risk": 0 };
+             knnRes.data.forEach(s => {
+                 if (tiers[s.predicted_tier] !== undefined) tiers[s.predicted_tier]++;
+             });
+             const pieData = Object.keys(tiers).map(key => ({ name: key, value: tiers[key] }));
+             setKnnData(pieData);
+        }
+
+        // Fetch EOQ Data
+        const eoqRes = await api.get('/analytics/eoq');
+        setEoqData(eoqRes.data);
 
       } catch (error) {
         console.error("Failed to fetch analytics:", error);
@@ -222,6 +240,74 @@ const Analytics = () => {
             </ResponsiveContainer>
           </div>
         </div>
+      </div>
+      
+      {/* New Section: Advanced Analytics (KNN & EOQ) */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+        
+        {/* KNN Supplier Classification */}
+        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+           <h3 className="text-lg font-bold text-gray-900 mb-2">Supplier Risk Classification (KNN)</h3>
+           <p className="text-sm text-gray-500 mb-6">AI-driven classification based on delivery time and defect rate.</p>
+           <div className="h-64 flex justify-center">
+             <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={knnData}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={60}
+                    outerRadius={80}
+                    paddingAngle={5}
+                    dataKey="value"
+                  >
+                    {knnData.map((entry, index) => {
+                        const colors = { "High Performance": "#10b981", "Average": "#f59e0b", "Risk": "#ef4444" };
+                        return <Cell key={`cell-${index}`} fill={colors[entry.name] || "#cbd5e1"} />;
+                    })}
+                  </Pie>
+                  <Tooltip />
+                  <Legend />
+                </PieChart>
+             </ResponsiveContainer>
+           </div>
+        </div>
+
+        {/* EOQ Analysis */}
+        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+           <h3 className="text-lg font-bold text-gray-900 mb-2">Inventory Optimization (EOQ)</h3>
+           <p className="text-sm text-gray-500 mb-4">Economic Order Quantity recommendations.</p>
+           <div className="overflow-y-auto h-64">
+             <table className="w-full text-sm text-left">
+                <thead className="bg-gray-50 text-gray-500 font-medium sticky top-0">
+                  <tr>
+                    <th className="px-4 py-2">Product</th>
+                    <th className="px-4 py-2">Stock</th>
+                    <th className="px-4 py-2">EOQ</th>
+                    <th className="px-4 py-2">Status</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-100">
+                  {eoqData.map((item) => (
+                    <tr key={item.id} className="hover:bg-gray-50">
+                      <td className="px-4 py-2 font-medium text-gray-900">{item.name}</td>
+                      <td className="px-4 py-2 text-gray-600">{item.current_stock}</td>
+                      <td className="px-4 py-2 text-gray-600">{item.eoq}</td>
+                      <td className="px-4 py-2">
+                        <span className={`px-2 py-1 rounded-full text-xs font-semibold
+                          ${item.status === 'Understocked' ? 'bg-red-100 text-red-700' : 
+                            item.status === 'Overstocked' ? 'bg-yellow-100 text-yellow-700' : 
+                            'bg-green-100 text-green-700'}`}>
+                          {item.status}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+             </table>
+           </div>
+        </div>
+
       </div>
     </div>
   );
