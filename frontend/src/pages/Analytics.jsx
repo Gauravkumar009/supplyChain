@@ -35,8 +35,6 @@ const Analytics = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Fetch Forecast for a specific product (e.g., ID 1 - Laptop Pro X)
-        // In a real app, you'd select the product.
         const forecastRes = await api.get('/analytics/forecast/1'); 
         if (forecastRes.data && forecastRes.data.dates) {
              const formattedForecast = forecastRes.data.dates.map((date, index) => ({
@@ -47,11 +45,9 @@ const Analytics = () => {
         }
 
         const abcRes = await api.get('/analytics/abc');
-        setAbcData(abcRes.data.slice(0, 10)); // Top 10 for view
+        setAbcData(abcRes.data.slice(0, 10)); 
 
-        // Fetch Supplier Classification (KNN)
         const knnRes = await api.get('/analytics/supplier-classification');
-        // Process for Pie Chart
         if (knnRes.data) {
              const tiers = { "High Performance": 0, "Average": 0, "Risk": 0 };
              knnRes.data.forEach(s => {
@@ -61,7 +57,6 @@ const Analytics = () => {
              setKnnData(pieData);
         }
 
-        // Fetch EOQ Data
         const eoqRes = await api.get('/analytics/eoq');
         setEoqData(eoqRes.data);
 
@@ -242,10 +237,8 @@ const Analytics = () => {
         </div>
       </div>
       
-      {/* New Section: Advanced Analytics (KNN & EOQ) */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
         
-        {/* KNN Supplier Classification */}
         <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
            <h3 className="text-lg font-bold text-gray-900 mb-2">Supplier Risk Classification (KNN)</h3>
            <p className="text-sm text-gray-500 mb-6">AI-driven classification based on delivery time and defect rate.</p>
@@ -273,7 +266,6 @@ const Analytics = () => {
            </div>
         </div>
 
-        {/* EOQ Analysis */}
         <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 overflow-hidden">
            <h3 className="text-lg font-bold text-gray-900 mb-2">Inventory Optimization (EOQ)</h3>
            <p className="text-sm text-gray-500 mb-4">Economic Order Quantity recommendations.</p>

@@ -1,19 +1,14 @@
-from fastapi import FastAPI, Depends, HTTPException
-from sqlalchemy.orm import Session
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from . import schemas, database
+from . import database
 from .routers import products, suppliers, orders, analytics, simulation, auth, reports
-
-# models.Base.metadata.create_all(bind=database.engine) is not needed for MongoDB
-# but we need to keep imports clean.
 
 app = FastAPI(title="SCM System")
 
-# CORS setup
 origins = [
     "http://localhost:5173",
     "http://localhost:3000",
-    "*" # Start by allowing all during development testing/deployment
+    "*" 
 ]
 
 app.add_middleware(
