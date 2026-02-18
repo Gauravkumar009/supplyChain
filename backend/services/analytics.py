@@ -17,7 +17,6 @@ def get_demand_forecast(db, product_id: int, periods: int = 3):
     """
     Simple linear regression forecast based on order history.
     """
-    # MongoDB Query
     orders = list(db.orders.find({"product_id": product_id}).sort("order_date", 1))
     
     if len(orders) < 2:
@@ -32,7 +31,6 @@ def get_demand_forecast(db, product_id: int, periods: int = 3):
     model = LinearRegression()
     model.fit(X, y)
 
-    # Predict for next 'periods' (approx days)
     last_date = df['date'].max()
     future_dates = [last_date + pd.Timedelta(days=i) for i in range(1, periods + 1)]
     future_ordinals = np.array([d.toordinal() for d in future_dates]).reshape(-1, 1)
@@ -55,7 +53,6 @@ def abc_analysis(db):
     data = []
     
     for p in products:
-        # Simplified: using stock value for ABC. Ideally use annual usage value.
         value = p["price"] * p["stock_level"]
         data.append({"product_id": p["id"], "name": p["name"], "value": value})
     

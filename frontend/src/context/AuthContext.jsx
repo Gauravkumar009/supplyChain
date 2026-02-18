@@ -14,7 +14,6 @@ export const AuthProvider = ({ children }) => {
       console.log("Token:", token);
       if (token) {
         try {
-          // Set token in headers for validation
           api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
           console.log("Verifying token with backend...");
           const response = await api.get('/auth/users/me');

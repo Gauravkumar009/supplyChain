@@ -19,7 +19,7 @@ const ProductModal = ({ isOpen, onClose, product, onSave }) => {
         price: product.price,
         stock_level: product.stock_level,
         reorder_point: product.reorder_point,
-        supplier_id: product.supplier_id || 1 // Default to 1 if missing for now
+        supplier_id: product.supplier_id || 1 
       });
     } else {
       setFormData({
@@ -28,7 +28,7 @@ const ProductModal = ({ isOpen, onClose, product, onSave }) => {
         price: '',
         stock_level: '',
         reorder_point: '',
-        supplier_id: 1 // Default supplier
+        supplier_id: 1 
       });
     }
   }, [product, isOpen]);

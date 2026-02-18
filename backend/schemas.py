@@ -2,7 +2,6 @@ from pydantic import BaseModel
 from typing import List, Optional
 from datetime import datetime
 
-# Supplier Schemas
 class SupplierBase(BaseModel):
     name: str
     contact_name: Optional[str] = None
@@ -20,7 +19,6 @@ class Supplier(SupplierBase):
     class Config:
         orm_mode = True
 
-# Product Schemas
 class ProductBase(BaseModel):
     name: str
     category: str
@@ -39,7 +37,6 @@ class Product(ProductBase):
     class Config:
         orm_mode = True
 
-# Order Schemas
 class OrderBase(BaseModel):
     product_id: int
     supplier_id: int
@@ -60,7 +57,6 @@ class OrderWithDetails(Order):
     product: Optional[Product] = None
     supplier: Optional[Supplier] = None
 
-# User Schemas
 class UserBase(BaseModel):
     username: str
     email: Optional[str] = None

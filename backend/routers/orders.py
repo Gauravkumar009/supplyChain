@@ -11,7 +11,6 @@ router = APIRouter(
 
 @router.post("/", response_model=schemas.Order)
 def create_order(order: schemas.OrderCreate, db = Depends(database.get_db), current_user: schemas.User = Depends(security.get_current_user)):
-    # Auto-increment ID
     last_order = list(db.orders.find().sort("id", -1).limit(1))
     new_id = 1
     if last_order:
@@ -21,13 +20,11 @@ def create_order(order: schemas.OrderCreate, db = Depends(database.get_db), curr
     new_order_data["id"] = new_id
     new_order_data["order_date"] = datetime.utcnow()
     
-    # Fetch and embed Product details
     product = db.products.find_one({"id": order.product_id})
     if not product:
         raise HTTPException(status_code=404, detail="Product not found")
     new_order_data["product"] = product
     
-    # Fetch and embed Supplier details
     supplier = db.suppliers.find_one({"id": order.supplier_id})
     if not supplier:
          raise HTTPException(status_code=404, detail="Supplier not found")

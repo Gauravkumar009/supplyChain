@@ -21,7 +21,6 @@ const Settings = () => {
       </div>
 
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden flex flex-col md:flex-row min-h-[600px]">
-        {/* Settings Sidebar */}
         <div className="w-full md:w-64 bg-gray-50 border-r border-gray-100 p-4">
            <nav className="flex flex-col gap-1">
              {tabs.map((tab) => {
@@ -45,7 +44,6 @@ const Settings = () => {
            </nav>
         </div>
 
-        {/* Content Area */}
         <div className="flex-1 p-6 md:p-8">
           {activeTab === 'profile' && (
             <div className="max-w-xl flex flex-col gap-6">

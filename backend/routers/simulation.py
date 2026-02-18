@@ -10,7 +10,6 @@ router = APIRouter(
 
 @router.post("/generate-order")
 def generate_random_order(db = Depends(database.get_db)):
-    # Fetch random product and supplier
     products = list(db.products.find())
     suppliers = list(db.suppliers.find())
     
@@ -20,10 +19,8 @@ def generate_random_order(db = Depends(database.get_db)):
     product = random.choice(products)
     supplier = random.choice(suppliers)
     
-    # Create a random order
     quantity = random.randint(1, 20)
     
-    # Auto-increment ID
     last_order = list(db.orders.find().sort("id", -1).limit(1))
     new_id = 1
     if last_order:
@@ -40,7 +37,6 @@ def generate_random_order(db = Depends(database.get_db)):
         "supplier": supplier
     }
     
-    # Update stock if shipped/delivered
     if new_order["status"] in ["Shipped", "Delivered"]:
          new_stock = product["stock_level"] + quantity
          db.products.update_one({"id": product["id"]}, {"$set": {"stock_level": new_stock}})

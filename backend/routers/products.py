@@ -10,7 +10,6 @@ router = APIRouter(
 
 @router.post("/", response_model=schemas.Product)
 def create_product(product: schemas.ProductCreate, db = Depends(database.get_db), current_user: schemas.User = Depends(security.get_current_user)):
-    # Auto-increment ID
     last_product = list(db.products.find().sort("id", -1).limit(1))
     new_id = 1
     if last_product:
@@ -19,7 +18,6 @@ def create_product(product: schemas.ProductCreate, db = Depends(database.get_db)
     new_product_data = product.dict()
     new_product_data["id"] = new_id
     
-    # Check if supplier exists
     supplier = db.suppliers.find_one({"id": product.supplier_id})
     if supplier:
         new_product_data["supplier"] = supplier
@@ -47,7 +45,6 @@ def update_product(product_id: int, product: schemas.ProductCreate, db = Depends
     
     update_data = product.dict(exclude_unset=True)
     
-    # If supplier_id changed, update embedded supplier
     if "supplier_id" in update_data:
          supplier = db.suppliers.find_one({"id": update_data["supplier_id"]})
          if supplier:
@@ -63,4 +60,3 @@ def delete_product(product_id: int, db = Depends(database.get_db), current_user:
         raise HTTPException(status_code=404, detail="Product not found")
     
     return {"message": "Product deleted successfully"}
-

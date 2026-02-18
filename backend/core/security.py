@@ -10,7 +10,6 @@ from .. import database
 
 load_dotenv()
 
-# Secret key to sign JWT
 SECRET_KEY = os.getenv("SECRET_KEY", "your_secret_key_keep_it_secret")
 ALGORITHM = os.getenv("ALGORITHM", "HS256")
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
@@ -48,7 +47,6 @@ async def get_current_user(token: str = Depends(oauth2_scheme), db = Depends(dat
     except JWTError:
         raise credentials_exception
     
-    # MongoDB Query
     user = db.users.find_one({"username": username})
     
     if user is None:

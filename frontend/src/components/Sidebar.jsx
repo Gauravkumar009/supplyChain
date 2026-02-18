@@ -9,7 +9,7 @@ const Sidebar = () => {
     { path: '/', label: 'Dashboard', icon: LayoutDashboard },
     { path: '/products', label: 'Inventory', icon: Package },
     { path: '/orders', label: 'Orders', icon: ShoppingCart },
-    { path: '/suppliers', label: 'Suppliers', icon: Users }, // Assuming suppliers page exists or reusing similar route
+    { path: '/suppliers', label: 'Suppliers', icon: Users }, 
     { path: '/analytics', label: 'Analytics', icon: TrendingUp },
   ];
 

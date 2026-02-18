@@ -54,7 +54,6 @@ def export_inventory(format: str, db = Depends(database.get_db), current_user: s
         if "supplier" in p and p["supplier"]:
             supplier_name = p["supplier"]["name"]
         elif "supplier_id" in p:
-             # Fallback fetch
              s = db.suppliers.find_one({"id": p["supplier_id"]})
              if s: supplier_name = s["name"]
 

@@ -37,7 +37,6 @@ const CreateOrderModal = ({ isOpen, onClose, onSave }) => {
     }
   }, [isOpen]);
 
-  // Auto-select supplier if product is selected and has a default supplier
   useEffect(() => {
     if (formData.product_id) {
       const product = products.find(p => p.id === parseInt(formData.product_id));

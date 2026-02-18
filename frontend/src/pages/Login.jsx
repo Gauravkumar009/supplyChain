@@ -19,13 +19,10 @@ const Login = () => {
     } catch (err) {
         console.error("Login error:", err);
         if (err.response) {
-            // Server responded with a status code
             setError(err.response.data.detail || 'Login failed. Please check credentials.');
         } else if (err.request) {
-            // Request was made but no response received
             setError('No response from server. Is the backend running?');
         } else {
-            // Something happened in setting up the request
             setError('Error processing request.');
         }
     }

@@ -14,7 +14,6 @@ def create_supplier(supplier: schemas.SupplierCreate, db = Depends(database.get_
     if db_supplier:
         raise HTTPException(status_code=400, detail="Supplier already registered")
     
-    # Generate a new ID for the supplier
     last_supplier = list(db.suppliers.find().sort("id", -1).limit(1))
     new_id = 1
     if last_supplier:
@@ -25,7 +24,6 @@ def create_supplier(supplier: schemas.SupplierCreate, db = Depends(database.get_
     
     db.suppliers.insert_one(new_supplier_data)
     
-    # Return the created supplier, including the generated ID
     return schemas.Supplier(**new_supplier_data)
 
 @router.get("/", response_model=List[schemas.Supplier])

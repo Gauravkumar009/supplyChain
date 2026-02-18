@@ -8,14 +8,9 @@ const SupplierOrdersModal = ({ isOpen, onClose, supplier }) => {
 
   useEffect(() => {
     if (isOpen && supplier) {
-      // In a real app, this would be /orders?supplier_id={supplier.id}
-      // For now, we'll fetch all orders and filter client-side or use a mock endpoint if implemented
       const fetchOrders = async () => {
         try {
           const response = await api.get('/orders');
-          // Filter orders for this supplier (assuming order has supplier_id or we just show random for demo)
-          // Since we just added supplier_id to backend, old orders might not have it.
-          // We will filter if supplier_id matches, OR for demo purposes show some if none match
           const supplierOrders = response.data.filter(o => o.supplier_id === supplier.id);
           setOrders(supplierOrders);
         } catch (error) {

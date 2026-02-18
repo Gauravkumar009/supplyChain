@@ -20,11 +20,6 @@ def create_user(user: schemas.UserCreate, db = Depends(database.get_db)):
         raise HTTPException(status_code=400, detail="Email already registered")
     
     hashed_password = security.get_password_hash(user.password)
-    # Get next sequence id (simplified for now, just using count+1 or random int could be risky for concurrency, 
-    # but for migration simplistic approach: find max id or use ObjectId string in future. 
-    # For compatibility with existing frontend expecting int IDs, we might need a counter collection.
-    # For now, let's try to stick to int IDs if possible or switch schemas to allow str ID in a separate step if needed. 
-    # For now, simplistic auto-increment simulation:
     last_user = list(db.users.find().sort("id", -1).limit(1))
     new_id = 1
     if last_user:

@@ -13,7 +13,6 @@ const Dashboard = () => {
   
   const [isLive, setIsLive] = useState(false);
   
-  // Dummy chart data to match the screenshot's bar chart
   const revenueData = [
     { name: 'Jan', value: 4000 },
     { name: 'Feb', value: 3000 },
@@ -36,20 +35,17 @@ const Dashboard = () => {
     fetchStats();
   }, []);
 
-  // Live Simulation Logic
   useEffect(() => {
     let interval;
     if (isLive) {
       interval = setInterval(async () => {
         try {
-          // Generate a random order to simulate activity
           await api.post('/simulate/generate-order');
-          // Refresh stats
           await fetchStats();
         } catch (error) {
           console.error("Simulation error:", error);
         }
-      }, 3000); // Run every 3 seconds
+      }, 3000); 
     }
     return () => clearInterval(interval);
   }, [isLive]);
@@ -75,7 +71,7 @@ const Dashboard = () => {
     },
     { 
       label: 'Active Orders', 
-      value: '142', // Mock data
+      value: '142', 
       change: '', 
       icon: Box, 
       iconColor: 'text-blue-600', 
@@ -83,7 +79,7 @@ const Dashboard = () => {
     },
     { 
       label: 'Forecast Accuracy', 
-      value: '94%', // Mock data
+      value: '94%',
       change: '', 
       icon: Activity, 
       iconColor: 'text-purple-600', 

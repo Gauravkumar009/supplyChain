@@ -29,7 +29,6 @@ def get_eoq_analysis(db = Depends(database.get_db)):
 
 @router.get("/dashboard-stats")
 def get_dashboard_stats(db = Depends(database.get_db)):
-    # Calculate Total Revenue using Aggregation
     pipeline = [
         {
             "$lookup": {

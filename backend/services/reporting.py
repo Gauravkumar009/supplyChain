@@ -25,9 +25,7 @@ def generate_pdf(data: list, title: str):
     if not data:
         elements.append(Paragraph("No data available", styles['Normal']))
     else:
-        # Convert dict keys to header
         headers = list(data[0].keys())
-        # Convert dict values to list of lists
         table_data = [headers] + [[str(row[col]) for col in headers] for row in data]
         
         t = Table(table_data)
